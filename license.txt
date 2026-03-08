@@ -1,0 +1,11 @@
+Model Information:
+* title:	Another 3d model of the human heart.
+* source:	https://sketchfab.com/3d-models/another-3d-model-of-the-human-heart-590dff6d9cd3487f9f3b136aaef9f453
+* author:	Joe_Bou_Khalil (https://sketchfab.com/Joe_Bou_Khalil)
+
+Model License:
+* license type:	CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)
+* requirements:	Author must be credited. Commercial use is allowed.
+
+If you use this 3D model in your project be sure to copy paste this credit wherever you share it:
+This work is based on "Another 3d model of the human heart." (https://sketchfab.com/3d-models/another-3d-model-of-the-human-heart-590dff6d9cd3487f9f3b136aaef9f453) by Joe_Bou_Khalil (https://sketchfab.com/Joe_Bou_Khalil) licensed under CC-BY-4.0 (http://creativecommons.org/licenses/by/4.0/)

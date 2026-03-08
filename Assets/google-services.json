@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "26497508836",
+    "project_id": "ar-med-96888",
+    "storage_bucket": "ar-med-96888.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:26497508836:android:6d9ddb29c3cf38dea853f1",
+        "android_client_info": {
+          "package_name": "com.divine.armed"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAQujcqvMCzFxmE_nD6nRXQ3cTxuoXaL8Y"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
