@@ -4,13 +4,13 @@ using TMPro;
 public class ARInteraction : MonoBehaviour
 {
     [Header("Camera")]
-    public Camera arCamera; // Drag ARCamera's Camera here (recommended)
+    public Camera arCamera;
 
     [Header("UI")]
-    public TMP_Text selectionText; // optional: can be the same as InfoText if you want
+    public TMP_Text selectionText;
 
-    [Header("Info Controller")]
-    public HeartInfoController heartInfoController; // Drag Heart root here (the one with HeartInfoController)
+    [Header("Heart Touch Manager")]
+    public HeartTouchManager heartTouchManager; // Drag HeartTouchManager GameObject here
 
     [Header("Raycast")]
     public float raycastDistance = 5000f;
@@ -22,9 +22,9 @@ public class ARInteraction : MonoBehaviour
         cam = arCamera != null ? arCamera : Camera.main;
         UpdateSelectionUI(null);
 
-        // If not assigned, try auto-find ONCE (not every tap)
-        if (heartInfoController == null)
-            heartInfoController = FindObjectOfType<HeartInfoController>();
+        // Auto-find if not assigned
+        if (heartTouchManager == null)
+            heartTouchManager = FindObjectOfType<HeartTouchManager>();
     }
 
     void Update()
@@ -41,7 +41,6 @@ public class ARInteraction : MonoBehaviour
     void HandleTouch()
     {
         if (Input.touchCount == 0) return;
-
         Touch t = Input.GetTouch(0);
         if (t.phase == TouchPhase.Began)
             TryTap(t.position);
@@ -60,27 +59,27 @@ public class ARInteraction : MonoBehaviour
         if (Physics.Raycast(ray, out RaycastHit hit, raycastDistance))
         {
             // Check if the tapped object belongs to the heart
-            var hitHeartInfo = hit.collider.GetComponentInParent<HeartInfoController>();
+            var hitManager = hit.collider.GetComponentInParent<HeartTouchManager>();
 
-            if (hitHeartInfo != null)
+            if (hitManager != null)
             {
-                hitHeartInfo.ShowInfo();
+                // HeartTouchManager handles its own tap logic - no need to call anything here
                 UpdateSelectionUI("Heart");
             }
             else
             {
-                // Tapped something else -> hide the heart info
-                if (heartInfoController != null)
-                    heartInfoController.HideInfo();
+                // Tapped something else - close the heart info panel
+                if (heartTouchManager != null)
+                    heartTouchManager.ClosePanel();
 
                 UpdateSelectionUI(hit.collider.gameObject.name);
             }
         }
         else
         {
-            // Tapped empty space -> hide info + reset prompt
-            if (heartInfoController != null)
-                heartInfoController.HideInfo();
+            // Tapped empty space
+            if (heartTouchManager != null)
+                heartTouchManager.ClosePanel();
 
             UpdateSelectionUI(null);
         }
@@ -91,7 +90,7 @@ public class ARInteraction : MonoBehaviour
         if (selectionText == null) return;
 
         if (string.IsNullOrEmpty(hitName))
-            selectionText.text = "Tap the Arm";
+            selectionText.text = "Tap the Heart";
         else
             selectionText.text = "Tapped: " + hitName;
     }
