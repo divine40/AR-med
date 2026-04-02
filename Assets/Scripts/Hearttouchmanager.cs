@@ -11,6 +11,9 @@ public class HeartTouchManager : MonoBehaviour
     public TextMeshProUGUI partNameText;
     public TextMeshProUGUI descriptionText;
 
+    [Header("Instruction Text")]
+    public TextMeshProUGUI instructionText;
+
     [Header("Heart")]
     public GameObject heartRoot;
     public HeartBeat heartBeat;
@@ -22,11 +25,22 @@ public class HeartTouchManager : MonoBehaviour
     private HeartHotspot[] allHotspots;
     private bool isPanelOpen = false;
     private Renderer heartRenderer;
+    private bool firstTapDone = false;
+
+    // Added for tap vs drag detection
+    private Vector2 startPos;
+    private bool isDragging = false;
 
     private void Start()
     {
         if (infoPanel != null)
             infoPanel.SetActive(false);
+
+        if (instructionText != null)
+        {
+            instructionText.text = "Tap the heart to start";
+            instructionText.gameObject.SetActive(true);
+        }
 
         if (heartBeat == null && heartRoot != null)
             heartBeat = heartRoot.GetComponent<HeartBeat>();
@@ -46,11 +60,48 @@ public class HeartTouchManager : MonoBehaviour
 
     private void Update()
     {
-        if (Input.touchCount > 0 && Input.GetTouch(0).phase == TouchPhase.Began)
-            HandleTap(Input.GetTouch(0).position);
-
+#if UNITY_EDITOR
         if (Input.GetMouseButtonDown(0))
-            HandleTap(Input.mousePosition);
+        {
+            startPos = Input.mousePosition;
+            isDragging = false;
+        }
+
+        if (Input.GetMouseButton(0))
+        {
+            if (Vector2.Distance(startPos, Input.mousePosition) > 10f)
+                isDragging = true;
+        }
+
+        if (Input.GetMouseButtonUp(0))
+        {
+            if (!isDragging)
+                HandleTap(Input.mousePosition);
+        }
+#else
+        if (Input.touchCount == 1)
+        {
+            Touch t = Input.GetTouch(0);
+
+            if (t.phase == TouchPhase.Began)
+            {
+                startPos = t.position;
+                isDragging = false;
+            }
+
+            if (t.phase == TouchPhase.Moved)
+            {
+                if (Vector2.Distance(startPos, t.position) > 10f)
+                    isDragging = true;
+            }
+
+            if (t.phase == TouchPhase.Ended)
+            {
+                if (!isDragging)
+                    HandleTap(t.position);
+            }
+        }
+#endif
     }
 
     private void HandleTap(Vector2 screenPos)
@@ -67,6 +118,14 @@ public class HeartTouchManager : MonoBehaviour
 
             if (hitHeart)
             {
+                if (!firstTapDone)
+                {
+                    firstTapDone = true;
+
+                    if (instructionText != null)
+                        instructionText.gameObject.SetActive(false);
+                }
+
                 HeartHotspot closest = GetClosestHotspot(hit.point);
                 if (closest != null)
                 {
@@ -108,7 +167,6 @@ public class HeartTouchManager : MonoBehaviour
 
         bool isArrhythmia = (heartBeat != null && heartBeat.isArrhythmia);
 
-        // Part name - always black
         if (partNameText != null)
         {
             partNameText.color = Color.black;
@@ -119,7 +177,6 @@ public class HeartTouchManager : MonoBehaviour
         {
             if (isArrhythmia)
             {
-                // Description black, arrhythmia warning red
                 descriptionText.color = Color.black;
                 descriptionText.text = partDesc +
                     "\n\n<color=#BF0D0D><b>ARRHYTHMIA DETECTED</b>\n" +
@@ -129,14 +186,12 @@ public class HeartTouchManager : MonoBehaviour
             }
             else
             {
-                // Normal - black text, description only
                 descriptionText.color = Color.black;
                 descriptionText.text = partDesc;
             }
         }
     }
 
-    // Called by the Arrhythmia button
     public void ToggleArrhythmiaFromUI()
     {
         if (heartBeat == null) return;
@@ -151,14 +206,12 @@ public class HeartTouchManager : MonoBehaviour
             if (infoPanel != null) infoPanel.SetActive(true);
             isPanelOpen = true;
 
-            // Title in red
             if (partNameText != null)
             {
                 partNameText.color = new Color(0.75f, 0.05f, 0.05f);
                 partNameText.text = "ARRHYTHMIA";
             }
 
-            // Full description in red
             if (descriptionText != null)
             {
                 descriptionText.color = new Color(0.75f, 0.05f, 0.05f);

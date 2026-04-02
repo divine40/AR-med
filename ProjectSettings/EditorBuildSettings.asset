@@ -18,10 +18,10 @@ EditorBuildSettings:
     path: Assets/Scenes/SkeletonScene.unity
     guid: db688fabdb9df5741b3d457657c30551
   - enabled: 1
-    path: Assets/Scenes/Quiz Scene.unity
-    guid: 4c29967c500eda949806b724a724b1bf
-  - enabled: 0
     path: Assets/Scenes/VenipunctureScene.unity
     guid: 6aac1c0ecf13e4d4fa97a3fda63e52d0
+  - enabled: 1
+    path: Assets/Scenes/Quiz Scene.unity
+    guid: 4c29967c500eda949806b724a724b1bf
   m_configObjects:
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: fe9947e640b971448a19ca0ac7d18b1c, type: 2}

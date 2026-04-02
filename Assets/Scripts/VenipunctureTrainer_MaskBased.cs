@@ -7,8 +7,11 @@ public class VenipunctureTrainer_MaskBased : MonoBehaviour
     [Header("References")]
     public Camera arCamera;
     public TMP_Text feedbackText;
-    public MeshCollider armMeshCollider;
-    public Texture2D veinMask;
+    public TMP_Text instructionText;
+
+    [Header("Colliders")]
+    public Collider armCollider;      // Arm_Real collider
+    public Collider correctZone;      // Quad collider
 
     [Header("Audio")]
     public AudioSource audioSource;
@@ -18,22 +21,14 @@ public class VenipunctureTrainer_MaskBased : MonoBehaviour
     [Header("Raycast")]
     public float raycastDistance = 5000f;
 
-    [Header("Mask Colors")]
-    public Color32 correctColor = new Color32(0, 255, 0, 255);   // green
-    public Color32 wrong1Color = new Color32(255, 0, 0, 255);   // red
-    public Color32 wrong2Color = new Color32(0, 0, 255, 255);   // blue
-
-    [Header("Color Match Tolerance")]
-    [Range(0, 50)]
-    public int tolerance = 20;
-
-    private bool completed;
+    private bool completed = false;
+    private bool firstTapDone = false;
 
     void Awake()
     {
         if (arCamera == null) arCamera = Camera.main;
         ResetTrainer();
-        Debug.Log("[MaskTrainer] Awake OK");
+        Debug.Log("[ZoneTrainer] Awake OK");
     }
 
     void Update()
@@ -60,55 +55,66 @@ public class VenipunctureTrainer_MaskBased : MonoBehaviour
 #endif
         }
 
-        if (arCamera == null || armMeshCollider == null || veinMask == null) return;
+        if (arCamera == null || armCollider == null || correctZone == null) return;
 
         Ray ray = arCamera.ScreenPointToRay(screenPos);
 
         if (!Physics.Raycast(ray, out RaycastHit hit, raycastDistance))
         {
-            Debug.Log("[MaskTrainer] Raycast hit nothing");
+            Debug.Log("[ZoneTrainer] Raycast hit nothing");
             return;
         }
 
-        if (hit.collider != armMeshCollider)
+        bool tappedArm = hit.collider == armCollider || hit.collider.transform.IsChildOf(armCollider.transform);
+        bool tappedCorrect = hit.collider == correctZone || hit.collider.transform.IsChildOf(correctZone.transform);
+
+        if (tappedCorrect)
         {
-            Debug.Log("[MaskTrainer] Hit something else: " + hit.collider.name);
+            CorrectTap();
             return;
         }
 
-        Vector2 uv = hit.textureCoord;
-        Color32 px = veinMask.GetPixelBilinear(uv.x, uv.y);
+        if (tappedArm)
+        {
+            WrongTap();
+            return;
+        }
 
-        Debug.Log($"[MaskTrainer] UV={uv} Pixel=({px.r},{px.g},{px.b},{px.a})");
-
-        if (ColorsMatch(px, correctColor))
-        {
-            completed = true;
-            SetFeedback("Correct! Median Cubital Vein", Color.green);
-            Play(correctClip);
-        }
-        else if (ColorsMatch(px, wrong1Color))
-        {
-            SetFeedback("Wrong. Cephalic vein. Try again.", Color.red);
-            Play(wrongClip);
-        }
-        else if (ColorsMatch(px, wrong2Color))
-        {
-            SetFeedback("Wrong. Basilic vein. Try again.", Color.red);
-            Play(wrongClip);
-        }
-        else
-        {
-            SetFeedback("Not a marked vein area. Try again.", Color.red);
-            Play(wrongClip);
-        }
+        Debug.Log("[ZoneTrainer] Hit something else: " + hit.collider.name);
     }
 
-    bool ColorsMatch(Color32 a, Color32 b)
+    public void CorrectTap()
     {
-        return Mathf.Abs(a.r - b.r) <= tolerance &&
-               Mathf.Abs(a.g - b.g) <= tolerance &&
-               Mathf.Abs(a.b - b.b) <= tolerance;
+        if (completed) return;
+
+        HideInstructionIfNeeded();
+
+        completed = true;
+        SetFeedback("Correct! Median Cubital Vein", Color.green);
+        Play(correctClip);
+        Debug.Log("[ZoneTrainer] Correct zone tapped");
+    }
+
+    public void WrongTap()
+    {
+        if (completed) return;
+
+        HideInstructionIfNeeded();
+
+        SetFeedback("Not a marked vein area", Color.red);
+        Play(wrongClip);
+        Debug.Log("[ZoneTrainer] Wrong arm area tapped");
+    }
+
+    void HideInstructionIfNeeded()
+    {
+        if (!firstTapDone)
+        {
+            firstTapDone = true;
+
+            if (instructionText != null)
+                instructionText.gameObject.SetActive(false);
+        }
     }
 
     void SetFeedback(string msg, Color c)
@@ -127,6 +133,18 @@ public class VenipunctureTrainer_MaskBased : MonoBehaviour
     public void ResetTrainer()
     {
         completed = false;
-        SetFeedback("Tap the best vein site on the arm.", Color.black);
+        firstTapDone = false;
+
+        if (feedbackText != null)
+        {
+            feedbackText.text = "";
+            feedbackText.color = Color.black;
+        }
+
+        if (instructionText != null)
+        {
+            instructionText.text = "Tap the best vein site on the arm.";
+            instructionText.gameObject.SetActive(true);
+        }
     }
 }
