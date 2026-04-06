@@ -86,8 +86,6 @@ The system consists of the following components:
 ### Option 2: Run from Source Code (Recommended for Reviewers)
 
 1. Clone the repository:
-
-```bash
 git clone https://github.com/divine40/AR-med.git
 2. Open the project in Unity.
 3. Install required dependencies:
