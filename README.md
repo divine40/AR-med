@@ -99,3 +99,62 @@ Add Firebase project credentials
 Enable Authentication
 6. Build the project for Android:
 File → Build Settings → Android → Build & Run
+
+How to Use the Application
+Open the application
+Log in using credentials
+Navigate to the main menu
+Select the Heart AR module
+Point the camera at the image target
+Interact with the 3D heart (rotate, zoom, tap parts)
+Explore the Skeleton module
+Explore the 3d arm model 
+Complete the quiz to assess understanding
+
+Scene Flow
+
+LoginScene - MenuScene - HeartScene - SkeletonScene - Veinpunturescene - QuizScene
+
+
+Demo Video
+
+https://drive.google.com/file/d/1lWaDURS46LbcFDZmlyKSVrvuAMMeRuJ1/view?usp=sharing
+
+Testing
+
+The application was tested using:
+
+Unity Editor
+Android device (Google Pixel 7 Pro)
+Tested Features
+AR image target detection
+3D model rendering
+Rotation and zoom interaction
+Touch labeling accuracy
+Arrhythmia simulation
+Skeleton interaction modes
+Quiz functionality and scoring
+
+Performance Optimization
+
+To ensure smooth performance on mid-range devices:
+
+3D models were optimized (polygon reduction)
+Textures were compressed
+Scripts were optimized to reduce processing load
+Lightweight UI components were used
+
+Limitations
+Limited number of test participants
+No automated testing implemented
+Performance may vary depending on device capability
+
+
+Repository Link
+
+https://github.com/divine40/AR-med
+
+Author
+
+Akunyiba Chimdalu Divinefavour
+Capstone Project – AR-Med
